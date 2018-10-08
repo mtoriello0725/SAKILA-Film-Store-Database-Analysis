@@ -137,9 +137,109 @@ ORDER BY customer.last_name, customer.first_name;
 ---
 
 -- 7a
+/*
+SELECT * FROM film
+WHERE (title LIKE "K%" OR title LIKE "Q%")
+AND language_id = (
+	SELECT language_id FROM language
+    WHERE name = "English"
+    );
+*/
 
+-- 7b
+/*
+SELECT first_name, last_name FROM actor
+WHERE actor_id IN (
+	SELECT actor_id FROM film_actor
+	WHERE film_id = (
+		SELECT film_id FROM film
+		WHERE title = "Alone Trip"
+        )
+	);
+*/
 
+-- 7c
+/*
+SELECT first_name, last_name, email FROM customer
+JOIN address ON (customer.address_id = address.address_id)
+JOIN city ON (address.city_id = city.city_id)
+JOIN country ON (city.country_id = country.country_id)
+WHERE country = "Canada";
+*/
+
+-- 7d
+/*
+SELECT * FROM film
+WHERE film_id IN (
+	SELECT film_id FROM film_category
+    WHERE category_id IN (
+		SELECT category_id FROM category
+        WHERE name = "Family"
+        )
+	);
+*/
+
+-- 7e
+/*
+SELECT film.title, COUNT(film.title) AS rental_count FROM rental
+JOIN inventory ON (rental.inventory_id = inventory.inventory_id)
+JOIN film ON (inventory.film_id = film.film_id)
+GROUP BY film.title
+ORDER BY rental_count DESC;
+*/
+
+-- 7f
+/*
+SELECT customer.store_id, SUM(amount) AS Total_spent FROM payment
+JOIN customer ON (payment.customer_id = customer.customer_id)
+GROUP BY customer.store_id;
+*/
+
+-- 7g
+/*
+SELECT store.store_id, city.city, country.country FROM store
+JOIN address ON (store.address_id = address.address_id)
+JOIN city ON (address.city_id = city.city_id)
+JOIN country ON (city.country_id = country.country_id);
+*/
+
+-- 7h
+-- payment -> rental -> inventory -> film_category -> category
+
+/*
+SELECT category.name, SUM(payment.amount) AS Total_Revenue FROM payment
+JOIN rental ON (payment.rental_id = rental.rental_id)
+JOIN inventory ON (rental.inventory_id = inventory.inventory_id)
+JOIN film_category ON (inventory.film_id = film_category.film_id)
+JOIN category ON (film_category.category_id = category.category_id)
+GROUP BY category.name
+ORDER BY Total_Revenue DESC
+Limit 5;
+*/
 
 ---
 
 -- 8a
+/*
+CREATE VIEW Top_5_Categories AS
+SELECT category.name, SUM(payment.amount) AS Total_Revenue FROM payment
+JOIN rental ON (payment.rental_id = rental.rental_id)
+JOIN inventory ON (rental.inventory_id = inventory.inventory_id)
+JOIN film_category ON (inventory.film_id = film_category.film_id)
+JOIN category ON (film_category.category_id = category.category_id)
+GROUP BY category.name
+ORDER BY Total_Revenue DESC
+Limit 5;
+*/
+
+-- 8b
+/*
+SELECT * FROM Top_5_Categories;
+*/
+
+-- 8c
+/*
+DROP VIEW Top_5_Categories;
+*/
+
+
